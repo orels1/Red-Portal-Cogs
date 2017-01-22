@@ -1,0 +1,8 @@
+{
+    "AUTHOR" : "orels",
+    "DESCRIPTION" : "Cog for interaction with Cogs.Red\n\nCommands:\n[p]redportal search <search_term> - searches through cogs listed on cogs.red (alias - redp)",
+    "DISABLED" : false,
+    "NAME" : "redportal",
+    "SHORT": "Cog for interaction with Cogs.Red",
+    "TAGS": ["api", "tools", "search"]
+}

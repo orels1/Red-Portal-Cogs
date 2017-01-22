@@ -1,0 +1,7 @@
+{
+    "AUTHOR" : "orels",
+    "DESCRIPTION" : "A collection of Cogs made for interactions with Cogs.Red (Red-Portal)",
+    "DISABLED" : false,
+    "NAME" : "Red-Portal-Cogs",
+    "SHORT": "Cogs for interactions with Cogs.Red"
+}
