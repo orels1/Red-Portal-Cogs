@@ -15,7 +15,7 @@ class Redportal:
         """Interact with cogs.red through your bot"""
 
         if ctx.invoked_subcommand is None:
-            await self.bot.say("Use [p]help redportal for info.")
+            await self.bot.send_cmd_help(ctx)
 
     async def _search_redportal(self, ctx, url):
         # future response dict
