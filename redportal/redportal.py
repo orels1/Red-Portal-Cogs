@@ -42,7 +42,7 @@ class Redportal:
                 embed.add_field(name='Author', value=cog['author']['name'], inline=True)
                 embed.add_field(name='Repo', value=cog['repo']['name'], inline=True)
                 embed.add_field(name='Command to add repo',
-                                value='{}repo add {} {}'.format(ctx.prefix, cog['repo']['name'], cog['links']['github']['repo']),
+                                value='{}cog repo add {} {}'.format(ctx.prefix, cog['repo']['name'], cog['links']['github']['repo']),
                                 inline=False)
                 embed.add_field(name='Command to add cog',
                                 value='{}cog install {} {}'.format(ctx.prefix, cog['repo']['name'], cog['name']),
