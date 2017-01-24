@@ -36,7 +36,7 @@ class Redportal:
             for cog in data['results']['list']:
                 embed = discord.Embed(title=cog['name'],
                                       url='https://cogs.red{}'.format(cog['links']['self']),
-                                      description= (len(cog['description']) > 175 and '{}...'.format(cog['description'][:175]) or cog['description']) or cog['short'],
+                                      description= ((cog['description'] and len(cog['description']) > 175 and '{}...'.format(cog['description'][:175])) or cog['description']) or cog['short'],
                                       color=0xfd0000)
                 embed.add_field(name='Type', value=cog['repo']['type'], inline=True)
                 embed.add_field(name='Author', value=cog['author']['name'], inline=True)
