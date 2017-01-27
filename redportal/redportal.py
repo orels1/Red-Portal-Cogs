@@ -60,8 +60,7 @@ class Redportal:
         """Searches for a cog"""
 
         # base url for the cogs.red search API
-        # base_url = 'https://cogs.red/api/v1/search/cogs'
-        base_url = 'http://127.0.0.1:3000/api/v1/search/cogs'
+        base_url = 'https://cogs.red/api/v1/search/cogs'
 
         done = False
 
