@@ -36,7 +36,7 @@ class Redportal:
             for cog in data['results']['list']:
                 embed = discord.Embed(title=cog['name'],
                                       url='https://cogs.red{}'.format(cog['links']['self']),
-                                      description= ((cog['description'] and len(cog['description']) > 175 and '{}...'.format(cog['description'][:175])) or cog['description']) or cog['short'],
+                                      description=((cog['description'] and len(cog['description']) > 175 and '{}...'.format(cog['description'][:175])) or cog['description']) or cog['short'],
                                       color=0xfd0000)
                 embed.add_field(name='Type', value=cog['repo']['type'], inline=True)
                 embed.add_field(name='Author', value=cog['author']['name'], inline=True)
@@ -47,6 +47,7 @@ class Redportal:
                 embed.add_field(name='Command to add cog',
                                 value='{}cog install {} {}'.format(ctx.prefix, cog['repo']['name'], cog['name']),
                                 inline=False)
+                embed.set_footer(text=(len(cog['tags']) > 0 and '🔖 {}'.format(', '.join(cog['tags']))) or 'No tags set 😢')
                 embeds.append(embed)
 
             return embeds
@@ -59,7 +60,8 @@ class Redportal:
         """Searches for a cog"""
 
         # base url for the cogs.red search API
-        base_url = 'https://cogs.red/api/v1/cogs/search'
+        # base_url = 'https://cogs.red/api/v1/search/cogs'
+        base_url = 'http://127.0.0.1:3000/api/v1/search/cogs'
 
         done = False
 
