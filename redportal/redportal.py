@@ -47,7 +47,7 @@ class Redportal:
                 embed.add_field(name='Command to add cog',
                                 value='{}cog install {} {}'.format(ctx.prefix, cog['repo']['name'], cog['name']),
                                 inline=False)
-                embed.set_footer(text=(len(cog['tags']) > 0 and '🔖 {}'.format(', '.join(cog['tags']))) or 'No tags set 😢')
+                embed.set_footer(text=(len(cog['tags'] or []) > 0 and '🔖 {}'.format(', '.join(cog['tags']))) or 'No tags set 😢')
                 embeds.append(embed)
 
             return embeds
