@@ -126,5 +126,6 @@ class Redportal:
             return await\
                 self.bot.delete_message(message)
 
+
 def setup(bot):
     bot.add_cog(Redportal(bot))
