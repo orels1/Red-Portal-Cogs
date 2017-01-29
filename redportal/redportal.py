@@ -1,7 +1,14 @@
+from urllib.parse import quote
 import discord
 from discord.ext import commands
-from urllib.parse import quote
 import aiohttp
+
+
+numbs = {
+    "next": "➡",
+    "back": "⬅",
+    "exit": "❌"
+}
 
 
 class Redportal:
@@ -64,48 +71,60 @@ class Redportal:
         # base url for the cogs.red search API
         base_url = 'https://cogs.red/api/v1/search/cogs'
 
-        done = False
+        # final request url
+        url = '{}/{}'.format(base_url, quote(term))
 
-        # query params
-        limit = 1
-        offset = 0
+        embeds = await self._search_redportal(ctx, url)
 
-        while not done:
-            # construct querystring from params
-            querystring = 'limit={}&offset={}'.format(limit, offset)
+        if embeds is not None:
+            await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30)
+        else:
+            await self.bot.say('No cogs were found or there was an error in the process')
 
-            # final request url
-            url = '{}/{}?{}'.format(base_url, quote(term), querystring)
-
-            embeds = await self._search_redportal(ctx, url)
-
-            if embeds is not None:
-                # save message for future deletion
-                messages = []
-                for embed in embeds:
-                    messages.append(await self.bot.say(embed=embed))
-
-                messages .append(await self.bot.say('Type `next` to show more results'))
-
-                answer = await self.bot.wait_for_message(timeout=15, author=ctx.message.author)
-
-                if answer is not None and answer.content.strip().lower() == 'next':
-                    # pagination step
-                    offset += 1
-
-                    # cleanup
-                    messages.append(answer)
-                    try:
-                        await self.bot.delete_messages(messages)
-                    except:
-                        pass
-
-                else:
-                    done = True
+    async def cogs_menu(self, ctx, cog_list: list,
+                        message: discord.Message=None,
+                        page=0, timeout: int=30):
+        """menu control logic for this taken from
+           https://github.com/Lunar-Dust/Dusty-Cogs/blob/master/menu/menu.py"""
+        cog = cog_list[page]
+        if not message:
+            message =\
+                await self.bot.send_message(ctx.message.channel, embed=cog)
+            await self.bot.add_reaction(message, "⬅")
+            await self.bot.add_reaction(message, "❌")
+            await self.bot.add_reaction(message, "➡")
+        else:
+            message = await self.bot.edit_message(message, embed=cog)
+        react = await self.bot.wait_for_reaction(
+            message=message, user=ctx.message.author, timeout=timeout,
+            emoji=["➡", "⬅", "❌"]
+        )
+        if react is None:
+            await self.bot.remove_reaction(message, "⬅", self.bot.user)
+            await self.bot.remove_reaction(message, "❌", self.bot.user)
+            await self.bot.remove_reaction(message, "➡", self.bot.user)
+            return None
+        reacts = {v: k for k, v in numbs.items()}
+        react = reacts[react.reaction.emoji]
+        if react == "next":
+            next_page = 0
+            if page == len(cog_list) - 1:
+                next_page = 0  # Loop around to the first item
             else:
-                await self.bot.say('No cogs were found or there was an error in the process')
-                done = True
-
+                next_page = page + 1
+            return await self.cogs_menu(ctx, cog_list, message=message,
+                                        page=next_page, timeout=timeout)
+        elif react == "back":
+            next_page = 0
+            if page == 0:
+                next_page = len(cog_list) - 1  # Loop around to the last item
+            else:
+                next_page = page - 1
+            return await self.cogs_menu(ctx, cog_list, message=message,
+                                        page=next_page, timeout=timeout)
+        else:
+            return await\
+                self.bot.delete_message(message)
 
 def setup(bot):
     bot.add_cog(Redportal(bot))
