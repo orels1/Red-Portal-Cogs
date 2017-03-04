@@ -100,9 +100,12 @@ class Redportal:
             emoji=["➡", "⬅", "❌"]
         )
         if react is None:
-            await self.bot.remove_reaction(message, "⬅", self.bot.user)
-            await self.bot.remove_reaction(message, "❌", self.bot.user)
-            await self.bot.remove_reaction(message, "➡", self.bot.user)
+            try:
+                await self.bot.remove_reaction(message, "⬅", self.bot.user)
+                await self.bot.remove_reaction(message, "❌", self.bot.user)
+                await self.bot.remove_reaction(message, "➡", self.bot.user)
+            except:
+                pass
             return None
         reacts = {v: k for k, v in numbs.items()}
         react = reacts[react.reaction.emoji]
@@ -123,8 +126,11 @@ class Redportal:
             return await self.cogs_menu(ctx, cog_list, message=message,
                                         page=next_page, timeout=timeout)
         else:
-            return await\
-                self.bot.delete_message(message)
+            try:
+                return await\
+                    self.bot.delete_message(message)
+            except:
+                pass
 
 
 def setup(bot):
