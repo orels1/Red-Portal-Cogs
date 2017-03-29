@@ -54,7 +54,7 @@ class Redportal:
                 embed.add_field(name='Command to add cog',
                                 value='{}cog install {} {}'.format(ctx.prefix, cog['repo']['name'], cog['name']),
                                 inline=False)
-                embed.set_footer(text='{}{}'.format('⭐{}'.format(cog['votes']),
+                embed.set_footer(text='{}{}'.format('{} ⭐ - '.format(cog['votes']),
                                                     (len(cog['tags'] or []) > 0 and '🔖 {}'.format(', '.join(cog['tags']))) or 'No tags set 😢'
                                                     ))
                 embeds.append(embed)
@@ -101,9 +101,12 @@ class Redportal:
         )
         if react is None:
             try:
-                await self.bot.remove_reaction(message, "⬅", self.bot.user)
-                await self.bot.remove_reaction(message, "❌", self.bot.user)
-                await self.bot.remove_reaction(message, "➡", self.bot.user)
+                try:
+                    await self.bot.clear_reactions(message)
+                except:
+                    await self.bot.remove_reaction(message, "⬅", self.bot.user)
+                    await self.bot.remove_reaction(message, "❌", self.bot.user)
+                    await self.bot.remove_reaction(message, "➡", self.bot.user)
             except:
                 pass
             return None
