@@ -118,6 +118,10 @@ class Redportal:
                 next_page = 0  # Loop around to the first item
             else:
                 next_page = page + 1
+            try:
+                await self.bot.remove_reaction(message, "➡", ctx.message.author)
+            except:
+                pass
             return await self.cogs_menu(ctx, cog_list, message=message,
                                         page=next_page, timeout=timeout)
         elif react == "back":
@@ -126,6 +130,10 @@ class Redportal:
                 next_page = len(cog_list) - 1  # Loop around to the last item
             else:
                 next_page = page - 1
+            try:
+                await self.bot.remove_reaction(message, "⬅", ctx.message.author)
+            except:
+                pass
             return await self.cogs_menu(ctx, cog_list, message=message,
                                         page=next_page, timeout=timeout)
         else:
