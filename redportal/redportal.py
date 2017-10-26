@@ -123,7 +123,7 @@ class Redportal:
             except:
                 pass
             return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=next_page, timeout=timeout, edata=data)
+                                        page=next_page, timeout=timeout, edata=edata)
         elif react == "back":
             page -= 1
             next_page = page % len(cog_list)
@@ -132,18 +132,18 @@ class Redportal:
             except:
                 pass
             return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=next_page, timeout=timeout, edata=data)
+                                        page=next_page, timeout=timeout, edata=edata)
         elif react == "install":
             if not (ctx.message.author.id == self.bot.settings.owner):
                 await self.bot.say("This function is only available to the bot owner.")
                 return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=page, timeout=timeout, edata=data)
+                                        page=page, timeout=timeout, edata=edata)
             else:
                 INSTALLER = self.bot.get_cog('Downloader')
                 if not INSTALLER:
                     await self.bot.say("You must have downloader loaded to use this function.")
                     return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=page, timeout=timeout, edata=data)
+                                        page=page, timeout=timeout, edata=edata)
 
                 repo1, repo2 = edata['results']['list'][page]['repo']['name'], edata['results']['list'][page]['links']['github']['repo']
                 cog1, cog2 = edata['results']['list'][page]['repo']['name'], edata['results']['list'][page]['name']
