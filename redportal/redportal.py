@@ -7,6 +7,7 @@ import aiohttp
 numbs = {
     "next": "➡",
     "back": "⬅",
+    "install": "✅",
     "exit": "❌"
 }
 
@@ -59,7 +60,7 @@ class Redportal:
                                                     ))
                 embeds.append(embed)
 
-            return embeds
+            return embeds, data
 
         else:
             return None
@@ -74,16 +75,16 @@ class Redportal:
         # final request url
         url = '{}/{}'.format(base_url, quote(term))
 
-        embeds = await self._search_redportal(ctx, url)
+        embeds, data = await self._search_redportal(ctx, url)
 
         if embeds is not None:
-            await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30)
+            await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30, edata=data)
         else:
             await self.bot.say('No cogs were found or there was an error in the process')
 
     async def cogs_menu(self, ctx, cog_list: list,
                         message: discord.Message=None,
-                        page=0, timeout: int=30):
+                        page=0, timeout: int=30, edata=None):
         """menu control logic for this taken from
            https://github.com/Lunar-Dust/Dusty-Cogs/blob/master/menu/menu.py"""
         cog = cog_list[page]
@@ -92,12 +93,13 @@ class Redportal:
                 await self.bot.send_message(ctx.message.channel, embed=cog)
             await self.bot.add_reaction(message, "⬅")
             await self.bot.add_reaction(message, "❌")
+            await self.bot.add_reaction(message, "✅")
             await self.bot.add_reaction(message, "➡")
         else:
             message = await self.bot.edit_message(message, embed=cog)
         react = await self.bot.wait_for_reaction(
             message=message, user=ctx.message.author, timeout=timeout,
-            emoji=["➡", "⬅", "❌"]
+            emoji=["➡", "✅", "⬅", "❌"]
         )
         if react is None:
             try:
@@ -106,6 +108,7 @@ class Redportal:
                 except:
                     await self.bot.remove_reaction(message, "⬅", self.bot.user)
                     await self.bot.remove_reaction(message, "❌", self.bot.user)
+                    await self.bot.remove_reaction(message, "✅", self.bot.user)
                     await self.bot.remove_reaction(message, "➡", self.bot.user)
             except:
                 pass
@@ -113,29 +116,42 @@ class Redportal:
         reacts = {v: k for k, v in numbs.items()}
         react = reacts[react.reaction.emoji]
         if react == "next":
-            next_page = 0
-            if page == len(cog_list) - 1:
-                next_page = 0  # Loop around to the first item
-            else:
-                next_page = page + 1
+            page += 1
+            next_page = page % len(cog_list)
             try:
                 await self.bot.remove_reaction(message, "➡", ctx.message.author)
             except:
                 pass
             return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=next_page, timeout=timeout)
+                                        page=next_page, timeout=timeout, edata=edata)
         elif react == "back":
-            next_page = 0
-            if page == 0:
-                next_page = len(cog_list) - 1  # Loop around to the last item
-            else:
-                next_page = page - 1
+            page -= 1
+            next_page = page % len(cog_list)
             try:
                 await self.bot.remove_reaction(message, "⬅", ctx.message.author)
             except:
                 pass
             return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=next_page, timeout=timeout)
+                                        page=next_page, timeout=timeout, edata=edata)
+        elif react == "install":
+            if not (ctx.message.author.id == self.bot.settings.owner):
+                await self.bot.say("This function is only available to the bot owner.")
+                return await self.cogs_menu(ctx, cog_list, message=message,
+                                        page=page, timeout=timeout, edata=edata)
+            else:
+                INSTALLER = self.bot.get_cog('Downloader')
+                if not INSTALLER:
+                    await self.bot.say("You must have downloader loaded to use this function.")
+                    return await self.cogs_menu(ctx, cog_list, message=message,
+                                        page=page, timeout=timeout, edata=edata)
+
+                repo1, repo2 = edata['results']['list'][page]['repo']['name'], edata['results']['list'][page]['links']['github']['repo']
+                cog1, cog2 = edata['results']['list'][page]['repo']['name'], edata['results']['list'][page]['name']
+
+                await ctx.invoke(INSTALLER._repo_add, repo1, repo2)
+                await ctx.invoke(INSTALLER._install, cog1, cog2)
+
+                return await self.bot.delete_message(message)
         else:
             try:
                 return await\
