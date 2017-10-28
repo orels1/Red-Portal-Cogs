@@ -1,3 +1,4 @@
+from cogs.utils.checks import is_owner_check
 from urllib.parse import quote
 import discord
 from discord.ext import commands
@@ -134,16 +135,16 @@ class Redportal:
             return await self.cogs_menu(ctx, cog_list, message=message,
                                         page=next_page, timeout=timeout, edata=edata)
         elif react == "install":
-            if not (ctx.message.author.id == self.bot.settings.owner):
+            if not is_owner_check(ctx):
                 await self.bot.say("This function is only available to the bot owner.")
                 return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=page, timeout=timeout, edata=edata)
+                                            page=page, timeout=timeout, edata=edata)
             else:
                 INSTALLER = self.bot.get_cog('Downloader')
                 if not INSTALLER:
-                    await self.bot.say("You must have downloader loaded to use this function.")
+                    await self.bot.say("The downloader cog must be loaded to use this feature.")
                     return await self.cogs_menu(ctx, cog_list, message=message,
-                                        page=page, timeout=timeout, edata=edata)
+                                                page=page, timeout=timeout, edata=edata)
 
                 repo1, repo2 = edata['results']['list'][page]['repo']['name'], edata['results']['list'][page]['links']['github']['repo']
                 cog1, cog2 = edata['results']['list'][page]['repo']['name'], edata['results']['list'][page]['name']
@@ -154,8 +155,7 @@ class Redportal:
                 return await self.bot.delete_message(message)
         else:
             try:
-                return await\
-                    self.bot.delete_message(message)
+                return await self.bot.delete_message(message)
             except:
                 pass
 
