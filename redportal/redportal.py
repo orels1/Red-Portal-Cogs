@@ -6,10 +6,10 @@ import aiohttp
 
 
 numbs = {
-    "next": "➡",
-    "back": "⬅",
-    "install": "✅",
-    "exit": "❌"
+    "next": "",
+    "back": "",
+    "install": "",
+    "exit": ""
 }
 
 
@@ -56,8 +56,8 @@ class Redportal:
                 embed.add_field(name='Command to add cog',
                                 value='{}cog install {} {}'.format(ctx.prefix, cog['repo']['name'], cog['name']),
                                 inline=False)
-                embed.set_footer(text='{}{}'.format('{} ⭐ - '.format(cog['votes']),
-                                                    (len(cog['tags'] or []) > 0 and '🔖 {}'.format(', '.join(cog['tags']))) or 'No tags set 😢'
+                embed.set_footer(text='{}{}'.format('{}  - '.format(cog['votes']),
+                                                    (len(cog['tags'] or []) > 0 and ' {}'.format(', '.join(cog['tags']))) or 'No tags set '
                                                     ))
                 embeds.append(embed)
 
@@ -70,17 +70,19 @@ class Redportal:
     async def search(self, ctx, *, term: str):
         """Searches for a cog"""
 
-        # base url for the cogs.red search API
-        base_url = 'https://cogs.red/api/v1/search/cogs'
+        try:        # base url for the cogs.red search API
+            base_url = 'https://cogs.red/api/v1/search/cogs'
 
-        # final request url
-        url = '{}/{}'.format(base_url, quote(term))
+             # final request url
+            url = '{}/{}'.format(base_url, quote(term))
 
-        embeds, data = await self._search_redportal(ctx, url)
+            embeds, data = await self._search_redportal(ctx, url)
 
-        if embeds is not None:
-            await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30, edata=data)
-        else:
+            if embeds is not None:
+                await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30, edata=data)
+            else:
+                await self.bot.say('No cogs were found or there was an error in the process')
+        except TypeError:
             await self.bot.say('No cogs were found or there was an error in the process')
 
     async def cogs_menu(self, ctx, cog_list: list,
@@ -92,25 +94,25 @@ class Redportal:
         if not message:
             message =\
                 await self.bot.send_message(ctx.message.channel, embed=cog)
-            await self.bot.add_reaction(message, "⬅")
-            await self.bot.add_reaction(message, "❌")
-            await self.bot.add_reaction(message, "✅")
-            await self.bot.add_reaction(message, "➡")
+            await self.bot.add_reaction(message, "")
+            await self.bot.add_reaction(message, "")
+            await self.bot.add_reaction(message, "")
+            await self.bot.add_reaction(message, "")
         else:
             message = await self.bot.edit_message(message, embed=cog)
         react = await self.bot.wait_for_reaction(
             message=message, user=ctx.message.author, timeout=timeout,
-            emoji=["➡", "✅", "⬅", "❌"]
+            emoji=["", "", "", ""]
         )
         if react is None:
             try:
                 try:
                     await self.bot.clear_reactions(message)
                 except:
-                    await self.bot.remove_reaction(message, "⬅", self.bot.user)
-                    await self.bot.remove_reaction(message, "❌", self.bot.user)
-                    await self.bot.remove_reaction(message, "✅", self.bot.user)
-                    await self.bot.remove_reaction(message, "➡", self.bot.user)
+                    await self.bot.remove_reaction(message, "", self.bot.user)
+                    await self.bot.remove_reaction(message, "", self.bot.user)
+                    await self.bot.remove_reaction(message, "", self.bot.user)
+                    await self.bot.remove_reaction(message, "", self.bot.user)
             except:
                 pass
             return None
@@ -120,7 +122,7 @@ class Redportal:
             page += 1
             next_page = page % len(cog_list)
             try:
-                await self.bot.remove_reaction(message, "➡", ctx.message.author)
+                await self.bot.remove_reaction(message, "", ctx.message.author)
             except:
                 pass
             return await self.cogs_menu(ctx, cog_list, message=message,
@@ -129,7 +131,7 @@ class Redportal:
             page -= 1
             next_page = page % len(cog_list)
             try:
-                await self.bot.remove_reaction(message, "⬅", ctx.message.author)
+                await self.bot.remove_reaction(message, "", ctx.message.author)
             except:
                 pass
             return await self.cogs_menu(ctx, cog_list, message=message,
