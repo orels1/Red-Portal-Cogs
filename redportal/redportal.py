@@ -70,17 +70,21 @@ class Redportal:
     async def search(self, ctx, *, term: str):
         """Searches for a cog"""
 
-        # base url for the cogs.red search API
-        base_url = 'https://cogs.red/api/v1/search/cogs'
+        try:
+            # base url for the cogs.red search API
+            base_url = 'https://cogs.red/api/v1/search/cogs'
 
-        # final request url
-        url = '{}/{}'.format(base_url, quote(term))
+             # final request url
+            url = '{}/{}'.format(base_url, quote(term))
 
-        embeds, data = await self._search_redportal(ctx, url)
+            embeds, data = await self._search_redportal(ctx, url)
 
-        if embeds is not None:
-            await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30, edata=data)
-        else:
+            if embeds is not None:
+                await self.cogs_menu(ctx, embeds, message=None, page=0, timeout=30, edata=data)
+            else:
+                await self.bot.say('No cogs were found or there was an error in the process')
+
+        except TypeError:
             await self.bot.say('No cogs were found or there was an error in the process')
 
     async def cogs_menu(self, ctx, cog_list: list,
