@@ -93,18 +93,28 @@ class Redportal:
         """menu control logic for this taken from
            https://github.com/Lunar-Dust/Dusty-Cogs/blob/master/menu/menu.py"""
         cog = cog_list[page]
+    
+        is_owner_or_co = is_owner_check(ctx)
+        if is_owner_or_co:
+            expected = ["➡", "✅", "⬅", "❌"]
+        else:
+            expected = ["➡", "⬅", "❌"] 
+
         if not message:
             message =\
                 await self.bot.send_message(ctx.message.channel, embed=cog)
             await self.bot.add_reaction(message, "⬅")
             await self.bot.add_reaction(message, "❌")
-            await self.bot.add_reaction(message, "✅")
+
+            if is_owner_or_co:
+                await self.bot.add_reaction(message, "✅")
+
             await self.bot.add_reaction(message, "➡")
         else:
             message = await self.bot.edit_message(message, embed=cog)
         react = await self.bot.wait_for_reaction(
             message=message, user=ctx.message.author, timeout=timeout,
-            emoji=["➡", "✅", "⬅", "❌"]
+            emoji=expected
         )
         if react is None:
             try:
@@ -113,7 +123,8 @@ class Redportal:
                 except:
                     await self.bot.remove_reaction(message, "⬅", self.bot.user)
                     await self.bot.remove_reaction(message, "❌", self.bot.user)
-                    await self.bot.remove_reaction(message, "✅", self.bot.user)
+                    if is_owner_or_co:
+                        await self.bot.remove_reaction(message, "✅", self.bot.user)
                     await self.bot.remove_reaction(message, "➡", self.bot.user)
             except:
                 pass
@@ -139,7 +150,7 @@ class Redportal:
             return await self.cogs_menu(ctx, cog_list, message=message,
                                         page=next_page, timeout=timeout, edata=edata)
         elif react == "install":
-            if not is_owner_check(ctx):
+            if not is_owner_or_co:
                 await self.bot.say("This function is only available to the bot owner.")
                 return await self.cogs_menu(ctx, cog_list, message=message,
                                             page=page, timeout=timeout, edata=edata)
