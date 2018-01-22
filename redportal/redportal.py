@@ -18,6 +18,10 @@ class Redportal:
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
+        
+    def __unload(self):
+        self.session.close()
 
     @commands.group(pass_context=True, aliases=['redp'])
     async def redportal(self, ctx):
@@ -31,7 +35,7 @@ class Redportal:
         data = None
 
         try:
-            async with aiohttp.get(url, headers={"User-Agent": "Sono-Bot"}) as response:
+            async with self.session.get(url, headers={"User-Agent": "Sono-Bot"}) as response:
                 data = await response.json()
 
         except:
