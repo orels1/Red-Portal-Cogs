@@ -281,7 +281,7 @@ class Redportal:
         answer = await self.bot.wait_for_message(timeout=15, author=ctx.message.author)
 
         if answer and answer.content.lower() == "yes":
-            self.bot.set_cog("cogs." + cog_name, True)
+            #self.bot.set_cog("cogs." + cog_name, True)
             await ctx.invoke(self.bot.get_cog('Owner').load, cog_name=cog_name)
         else:
             await self.bot.say("Ok then, you can load it with `{}load {}`".format(ctx.prefix, cog_name))
